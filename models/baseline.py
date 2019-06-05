@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from neural.layers import Flatten
+from neural.layers import Flatten, Reshape
 
 class BaselineVAE(nn.Module):
     def __init__(self):
@@ -19,7 +19,7 @@ class BaselineVAE(nn.Module):
 
         self.decode_nn = nn.Sequential(
             nn.Linear(30, 30000),
-            nn.Sigmoid()
+            Reshape((3, 100, 100))
         )
 
     def encode(self, x):

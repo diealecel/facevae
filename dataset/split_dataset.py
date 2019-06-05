@@ -3,11 +3,11 @@ from os import listdir
 from os.path import join
 
 SRC_DIR = 'images'
-TRAIN_DIR = '1k_images'
-TEST_DIR = '100_images'
+TRAIN_DIR = '10k_images'
+TEST_DIR = '500_images'
 
-NUM_TEST = 100
-NUM_TRAIN = 1000
+NUM_TEST = 500
+NUM_TRAIN = 10000
 
 # curr_num_train = 0
 # for filename in listdir(SRC_DIR):

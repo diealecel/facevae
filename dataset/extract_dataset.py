@@ -3,7 +3,8 @@ from skimage.io import imread, imsave               # For reading and writing im
 from argparse import ArgumentParser                 # For argument parsing.
 from warnings import filterwarnings                 # For catching warnings.
 from urllib.error import HTTPError                  # For catching 404 exceptions.
-from os.path import join, isfile                    # For save_image() and check_existence().
+from os.path import join, splitext                  # For save_image() and get_extracted_data().
+from os import listdir                              # For get_extracted_data().
 from time import sleep                              # For making workers sleep after fails.
 from sys import stdout                              # For print_progress().
 import csv                                          # For reading data.
@@ -53,6 +54,8 @@ NUM_WORKERS = 32
 CHUNK_SZ = 256
 MAX_REQ_ATTEMPTS = 3
 WAIT_INTERVAL = 10
+
+extracted = frozenset()
 
 # Prints a progress bar to inform user of work being done.
 def print_progress(iteration, total, prefix = '', suffix = '', decimals = 2, bar_length = 100):
@@ -107,8 +110,7 @@ def save_image(image, datum):
 
 # Returns whether or not |datum| has already been processed.
 def already_extracted(datum):
-    predicted_loc = join(SAVE_DIR, datum.id + EXT)
-    return isfile(predicted_loc)
+    return datum.id in extracted
 
 
 # Downloads, processes, and saves the image from |datum|.
@@ -127,7 +129,7 @@ def get_data():
     data_points = []
     with open(DATA_FILE, 'r') as data_csv:
         data = csv.reader(data_csv)
-        print('Reading data...')
+        print('Reading all data...')
         for datum_info in data:
             datum = Datum(datum_info[ID_IDX], datum_info[URL_IDX],
                           datum_info[X1_IDX], datum_info[Y1_IDX],
@@ -137,9 +139,23 @@ def get_data():
     return data_points
 
 
+# Returns a frozenset that includes all the filenames without extensions of the
+# images that have already been extracted.
+def get_extracted_data():
+    extracted_data = []
+    print('Finding extracted data...')
+    for file in listdir(SAVE_DIR):
+        filename, _ = splitext(file)
+        extracted_data.append(filename)
+
+    return frozenset(extracted_data)
+
+
 # Extracts the cropped images detailed in |DATA_FILE|. Multiprocessing can
 # be enabled via |multiprocessing_on|.
 def extract_data(multiprocessing_on):
+    global extracted
+    extracted = get_extracted_data()
     data = get_data()
 
     if multiprocessing_on:

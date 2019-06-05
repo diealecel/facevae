@@ -1,2 +1,6 @@
 .env/
 results/*
+dataset/10k_500_split
+dataset/10k_500_split_256
+dataset/data.csv
+dataset/images

@@ -1,0 +1,178 @@
+import torch
+from torch import nn
+
+from neural.layers import Flatten, Reshape
+
+class VAE7(nn.Module):
+    def __init__(self):
+        super(VAE7, self).__init__()
+
+        # ENCODE
+        self.e_conv1 = nn.Conv2d(3, 64, kernel_size = 5, stride = 2)
+        self.e_prelu1 = nn.PReLU()
+        self.e_bn1 = nn.BatchNorm2d(64)
+        self.e_conv2 = nn.Conv2d(64, 64, kernel_size = 4, stride = 2)
+        self.e_prelu2 = nn.PReLU()
+        self.e_bn2 = nn.BatchNorm2d(64)
+        self.e_conv3 = nn.Conv2d(64, 32, kernel_size = 4)
+        self.e_prelu3 = nn.PReLU()
+        self.e_bn3 = nn.BatchNorm2d(32)
+        self.e_conv4 = nn.Conv2d(32, 32, kernel_size = 4)
+        self.e_prelu4 = nn.PReLU()
+        self.e_bn4 = nn.BatchNorm2d(32)
+        self.e_conv5 = nn.Conv2d(32, 16, kernel_size = 3)
+        self.e_prelu5 = nn.PReLU()
+        self.e_bn5 = nn.BatchNorm2d(16)
+        self.e_conv6 = nn.Conv2d(16, 16, kernel_size = 3)
+        self.e_prelu6 = nn.PReLU()
+        self.e_bn6 = nn.BatchNorm2d(16)
+        self.e_conv7 = nn.Conv2d(16, 8, kernel_size = 3)
+        self.e_prelu7 = nn.PReLU()
+        self.e_bn7 = nn.BatchNorm2d(8)
+        self.e_conv8 = nn.Conv2d(8, 8, kernel_size = 2)
+        self.e_prelu8 = nn.PReLU()
+        self.e_bn8 = nn.BatchNorm2d(8)
+        self.e_conv9 = nn.Conv2d(8, 4, kernel_size = 2)
+        self.e_prelu9 = nn.PReLU()
+        self.e_bn9 = nn.BatchNorm2d(4)
+        self.e_conv10 = nn.Conv2d(4, 4, kernel_size = 2)
+        self.e_prelu10 = nn.PReLU()
+        self.e_bn10 = nn.BatchNorm2d(4)
+        self.e_flatten = Flatten()
+        self.e_lin1 = nn.Linear(256, 200)
+        self.e_prelu11 = nn.PReLU()
+
+        self.mu_fc = nn.Linear(200, 1)
+        self.logvar_fc = nn.Linear(200, 1)
+
+
+        # DECODE
+        self.d_lin1 = nn.Linear(1, 200)
+        self.d_prelu1 = nn.PReLU()
+        self.d_lin2 = nn.Linear(200, 256)
+        self.d_reshape = Reshape((4, 8, 8))
+        self.d_prelu2 = nn.PReLU()
+        self.d_convt1 = nn.ConvTranspose2d(4, 4, kernel_size = 2)
+        self.d_prelu3 = nn.PReLU()
+        self.d_bn1 = nn.BatchNorm2d(4)
+        self.d_convt2 = nn.ConvTranspose2d(4, 8, kernel_size = 2)
+        self.d_prelu4 = nn.PReLU()
+        self.d_bn2 = nn.BatchNorm2d(8)
+        self.d_convt3 = nn.ConvTranspose2d(8, 8, kernel_size = 2)
+        self.d_prelu5 = nn.PReLU()
+        self.d_bn3 = nn.BatchNorm2d(8)
+        self.d_convt4 = nn.ConvTranspose2d(8, 16, kernel_size = 3)
+        self.d_prelu6 = nn.PReLU()
+        self.d_bn4 = nn.BatchNorm2d(16)
+        self.d_convt5 = nn.ConvTranspose2d(16, 16, kernel_size = 3)
+        self.d_prelu7 = nn.PReLU()
+        self.d_bn5 = nn.BatchNorm2d(16)
+        self.d_convt6 = nn.ConvTranspose2d(16, 32, kernel_size = 3)
+        self.d_prelu8 = nn.PReLU()
+        self.d_bn6 = nn.BatchNorm2d(32)
+        self.d_convt7 = nn.ConvTranspose2d(32, 32, kernel_size = 4)
+        self.d_prelu9 = nn.PReLU()
+        self.d_bn7 = nn.BatchNorm2d(32)
+        self.d_convt8 = nn.ConvTranspose2d(32, 64, kernel_size = 4)
+        self.d_prelu10 = nn.PReLU()
+        self.d_bn8 = nn.BatchNorm2d(64)
+        self.d_convt9 = nn.ConvTranspose2d(64, 64, kernel_size = 4, stride = 2)
+        self.d_prelu11 = nn.PReLU()
+        self.d_bn9 = nn.BatchNorm2d(64)
+        self.d_convt10 = nn.ConvTranspose2d(64, 3, kernel_size = 5, stride = 2, output_padding = 1)
+        self.d_bn10 = nn.BatchNorm2d(3)
+
+
+    def encode(self, x):
+        x = self.e_conv1(x)
+        x = self.e_prelu1(x)
+        x = self.e_bn1(x)
+        x = self.e_conv2(x)
+        x = self.e_prelu2(x)
+        x = self.e_bn2(x)
+        x = self.e_conv3(x)
+        x = self.e_prelu3(x)
+        x = self.e_bn3(x)
+        x = self.e_conv4(x)
+        x = self.e_prelu4(x)
+        x = self.e_bn4(x)
+        x = self.e_conv5(x)
+        x = self.e_prelu5(x)
+        x = self.e_bn5(x)
+        x = self.e_conv6(x)
+        x = self.e_prelu6(x)
+        x = self.e_bn6(x)
+        x = self.e_conv7(x)
+        x = self.e_prelu7(x)
+        x = self.e_bn7(x)
+        x = self.e_conv8(x)
+        x = self.e_prelu8(x)
+        x = self.e_bn8(x)
+        x = self.e_conv9(x)
+        x = self.e_prelu9(x)
+        x = self.e_bn9(x)
+        x = self.e_conv10(x)
+        x = self.e_prelu10(x)
+        x = self.e_bn10(x)
+        x = self.e_flatten(x)
+        x = self.e_lin1(x)
+        x = self.e_prelu11(x)
+
+        mu = self.mu_fc(x)
+        logvar = self.logvar_fc(x)
+
+        return mu, logvar
+
+
+    def reparametrize(self, mu, logvar):
+        std = torch.exp(.5 * logvar)
+        eps = torch.randn_like(std)
+
+        return mu + eps * std
+
+
+    def decode(self, z):
+        z = self.d_lin1(z)
+        z = self.d_prelu1(z)
+        z = self.d_lin2(z)
+        z = self.d_reshape(z)
+        z = self.d_prelu2(z)
+        z = self.d_convt1(z)
+        z = self.d_prelu3(z)
+        z = self.d_bn1(z)
+        z = self.d_convt2(z)
+        z = self.d_prelu4(z)
+        z = self.d_bn2(z)
+        z = self.d_convt3(z)
+        z = self.d_prelu5(z)
+        z = self.d_bn3(z)
+        z = self.d_convt4(z)
+        z = self.d_prelu6(z)
+        z = self.d_bn4(z)
+        z = self.d_convt5(z)
+        z = self.d_prelu7(z)
+        z = self.d_bn5(z)
+        z = self.d_convt6(z)
+        z = self.d_prelu8(z)
+        z = self.d_bn6(z)
+        z = self.d_convt7(z)
+        z = self.d_prelu9(z)
+        z = self.d_bn7(z)
+        z = self.d_convt8(z)
+        z = self.d_prelu10(z)
+        z = self.d_bn8(z)
+        z = self.d_convt9(z)
+        z = self.d_prelu11(z)
+        z = self.d_bn9(z)
+        z = self.d_convt10(z)
+        z = self.d_bn10(z)
+
+        return z
+
+
+    def forward(self, x):
+        mu, logvar = self.encode(x)
+        z = self.reparametrize(mu, logvar)
+        out = self.decode(z)
+
+        return out, mu, logvar

@@ -4,8 +4,8 @@ from PIL import Image
 from os.path import join
 from skimage.io import imread, imsave
 
-DIR = 'milestone2_split/train/1k_images'
-TARGET_H, TARGET_W = 100, 100
+DIR = '10k_500_split_256/test/500_images'
+TARGET_H, TARGET_W = 256, 256
 
 
 def dirty_resize(image):
